@@ -56,14 +56,14 @@ HH:mm,DESTINATION,VOIE
 06:27,PARIS,2
 ```
 
-##Lancement du programme
+## Lancement du programme
 Une fois tout branché correctement, le programme peut être lancé sur l'ordinateur via la command shell suivante : 
 ```
 python afficheur_trains.py 
 ```
 Le lanceur `lancer_afficheurs.bat` permet de lancer ce programme facilement sur Windows.
 
-##Améliorations possibles
+## Améliorations possibles
 - Rafraichissement uniquement si détection de données différentes
 - Contrôle et selection manuelle du port COM à utiliser.
 - Amélioration de l'affichage sur la console.
