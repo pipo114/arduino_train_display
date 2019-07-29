@@ -1,3 +1,4 @@
+import argparse
 import csv
 import datetime
 import sys
@@ -21,28 +22,33 @@ SSD1306_NB_CHAR_LIGNE = 21
 SSD1306_NB_LIGNES = 8
 
 
-def formater_lignes_afficheur(trains_a_afficher, is_depart=True):
-    '''
+def formater_lignes_afficheur(trains_a_afficher, is_depart=True, sep=';'):
+    """
     Formate les trains pour que cela rendre bien sur le module SSD1306
-    :param trains_a_afficher:
-    :return: string contenant toutes les lignes a envoyer à l'arduino
-    '''
+    :param trains_a_afficher: liste des train à afficher
+    :type trains_a_afficher: dict
+    :param is_depart: True si affichage des trains au départ
+    :type is_depart: bool
+    :param sep: séparateur de ligne à utiliser
+    :type sep:basestring
 
-    '''
-    répartition des charactères :
-	heure : 5 char
-	espace
-	destination 12 char
-	espace
-	voie : 2 char
-    '''
+    :return: string contenant toutes les lignes a envoyer à l'arduino
+    """
+
+    # répartition des charactères :
+    # heure : 5 char
+    # espace
+    # destination 12 char
+    # espace
+    # voie : 2 char
+
     result = ''
 
     # ligne de titre / en tetes
     titre = "DEPART" if is_depart else "ARRIVEE"
     titre = titre.ljust(10, " ")
-    result += "HEURE %s VOIE;" % titre;
-    result += "---------------------;";
+    result += "HEURE %s VOIE%s" % (titre, sep)
+    result += "---------------------" + sep
 
     # affichage des trains
     for train in trains_a_afficher:
@@ -55,16 +61,16 @@ def formater_lignes_afficheur(trains_a_afficher, is_depart=True):
         result += str(train[DESTINATION]).ljust(12, " ")
         result += ' '
         result += str(train[VOIE]).rjust(2, " ")
-        result += ";"
+        result += sep
     return result
 
 
 def charger_fichier(fichier):
-    '''
+    """
     Charge le fichier d'horaireq
     :param fichier:
     :return:
-    '''
+    """
     horaires = []
     with open(fichier, 'r') as csvFile:
         reader = csv.reader(csvFile)
@@ -76,20 +82,20 @@ def charger_fichier(fichier):
 
 
 def get_heure():
-    '''
+    """
     Récupère l'heure de référence.
     :return:
-    '''
+    """
     return datetime.datetime.now()
 
 
 def filtrer_trains(horaires):
-    '''
+    """
     Filtre les trains à afficher en fonction d'une heure donnée
     :param horaires:
     :return:
-    '''
-    now = get_heure();
+    """
+    now = get_heure()
     trains_a_afficher = []
 
     # filtre les trains à afficher
@@ -117,29 +123,43 @@ def envoi_serial(ligne):
         serie.write(ligne)
 
 
+def print_trains_console(trains_arrivees, horaires_departs):
+    print(formater_lignes_afficheur(trains_arrivees, True, '\n'))
+    print(formater_lignes_afficheur(horaires_departs, False, '\n'))
+
 def afficheur_trains():
-    '''
+    """
     Programme principal
     :return:
-    '''
+    """
 
-    # récupérations des bons COM ports
-    com_ports_dispo = []
-    for port in serial.tools.list_ports.comports():
-        com_ports_dispo.append(port.device)
-    print("Ports séries détectés : %s " % com_ports_dispo)
-    #com_ports_dispo = ['/dev/ttyUSB0']
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--comport', help='Definit un port COM à utiliser en particulier')
+    args = parser.parse_args()
+
+    if args.comport:
+        selected_port = args.comport
+    else:
+        # récupérations des COM ports
+        com_ports_dispo = []
+        for port in serial.tools.list_ports.comports():
+            com_ports_dispo.append(port.device)
+        print("Ports séries détectés : %s " % com_ports_dispo)
+        if com_ports_dispo:
+            selected_port = com_ports_dispo[0]
+        else:
+            print("Aucun port trouvé")
+            exit(1)
+    print("Port sélectionné : %s" % selected_port)
 
     # ouverture du premier port série disponible
     global serie
-    for port in com_ports_dispo:
-        try:
-            serie = serial.Serial(port, 115200, timeout=1)
-            if not serie.is_open:
-                serie.open()
-            break
-        except (OSError, serial.SerialException):
-            pass
+    try:
+        serie = serial.Serial(selected_port, 115200, timeout=1)
+        if not serie.is_open:
+            serie.open()
+    except (OSError, serial.SerialException):
+        pass
 
     while True:
         # chargement des trains depuis le fichier en question
@@ -155,7 +175,8 @@ def afficheur_trains():
         ligne += '@'
         ligne += formater_lignes_afficheur(trains_departs, True)
 
-        print(ligne)
+        print_trains_console(trains_arrivees, trains_departs)
+
         # envoi de la ligne sur le serial
         envoi_serial(ligne)
 
