@@ -168,8 +168,8 @@ def print_trains_fichier(trains_arrivees, trains_departs):
     :param trains_arrivees: trains à afficher à l'arrivée
     :param trains_departs:  trains à afficher au départ
     """
-    train_json = {'arrivees' : trains_arrivees, 'departs' : trains_departs}
-    with open('prochains_trains.json', 'w') as f:
+    train_json = {'arrivees': trains_arrivees, 'departs': trains_departs}
+    with open(os.path.join('web', 'prochains_trains.json'), 'w') as f:
         json.dump(train_json, f, indent=4)
 
 

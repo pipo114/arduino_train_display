@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prochains Trains</title>
+    <script src="jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+
+    <script>
+
+
+    $(function() {
+        $.getJSON("prochains_trains.json", function(json) {
+            jQuery.each(json, function(index_sens, sens){
+                jQuery.each(sens, function(index, train){
+                    train_html="<tr>";
+                    jQuery.each(train, function(index, val){
+                        train_html += "<td>"+val+"</td></td>"
+                    });
+                    train_html += "</td>";
+                    $("#" + index_sens).append(train_html);
+                });
+            });
+        });
+    });
+
+    </script>
+
+</head>
+<body>
+
+    <table id="departs" class="tableTrain">
+        <tr >
+            <th>HEURE</th>
+            <th>DEPARTS</th>
+            <th>VOIE</th>
+        </tr>
+    </table>
+
+    <br/>
+
+    <table id="arrivees" class="tableTrain">
+        <tr>
+            <th>HEURE</th>
+            <th>ARRIVEE</th>
+            <th>VOIE</th>
+        </tr>
+    </table>
+
+
+
+</body>
+</html>
