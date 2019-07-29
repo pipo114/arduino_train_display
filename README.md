@@ -64,8 +64,8 @@ python afficheur_trains.py
 Le lanceur `lancer_afficheurs.bat` permet de lancer ce programme facilement sur Windows.
 
 ## Améliorations possibles
-[ ] Rafraichissement uniquement si détection de données différentes
-[X] Contrôle et selection manuelle du port COM à utiliser.
-[X] Amélioration de l'affichage sur la console.
-[ ] Dockerisation du système (facilitation de l'installation de python et des librairies)
-[ ] Intégration d'un serveur WEB permettant un affichage déporté des train au départ et à l'arrivée sur grand écran via une page WEB
+- [ ] Rafraichissement uniquement si détection de données différentes
+- [X] Contrôle et selection manuelle du port COM à utiliser.
+- [X] Amélioration de l'affichage sur la console.
+- [ ] Dockerisation du système (facilitation de l'installation de python et des librairies)
+- [ ] Intégration d'un serveur WEB permettant un affichage déporté des train au départ et à l'arrivée sur grand écran via une page WEB
